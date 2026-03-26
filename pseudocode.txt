@@ -1,0 +1,58 @@
+Input: initial_capital, win_rate, breakeven_rate, risk_per_trade,
+       avg_win_loss_ratio, num_trades, num_simulations
+Output: results_list containing all simulation statistics
+
+  Create empty list results_list
+  For i ← 1 to num_simulations do
+      Set capital ← initial_capital
+      Set peak_capital ← capital
+      Set max_drawdown ← 0
+      Set consecutive_losses ← 0
+      Set max_consecutive_losses ← 0
+      
+      For j ← 1 to num_trades do
+         Generate random_value ← Random(0, 1)
+
+         If random_value < win_rate then
+             profit ← capital × risk_per_trade × avg_win_loss_ratio
+             capital ← capital + profit
+             consecutive_losses ← 0
+
+         Else if random_value < win_rate + breakeven_rate then
+             capital ← capital   // no change (breakeven)
+
+         Else
+             loss ← capital × risk_per_trade
+             capital ← capital – loss
+             consecutive_losses ← consecutive_losses + 1
+
+         End If
+
+         If capital > peak_capital then
+             peak_capital ← capital
+         End If
+         drawdown ← peak_capital – capital
+         If drawdown > max_drawdown then
+             max_drawdown ← drawdown
+         End If
+
+        If consecutive_losses > max_consecutive_losses then
+            max_consecutive_losses ← consecutive_losses
+        End If
+
+    End For
+
+    Store (final_capital = capital,
+           max_drawdown,
+           max_consecutive_losses,
+           simulation_id = i)
+           in results_list
+
+ End For
+
+ Compute aggregated_metrics:
+        average_final_capital,
+        probability_of_profit,
+        worst_case_drawdown,
+        distribution_of_results
+ Return results_list and aggregated_metrics

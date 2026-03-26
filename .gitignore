@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+
+config.php
+phpmyadmin/
+*.log
+
+__pycache__/
+*.py[cod]

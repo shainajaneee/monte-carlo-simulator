@@ -1,0 +1,79 @@
+//*
+=========================================================
+MONTE CARLO TRADING SIMULATION - ALGORITHM DESCRIPTION
+=========================================================
+
+This file contains the algorithm used to simulate trading
+outcomes using Monte Carlo methods.
+
+ALGORITHM STEPS:
+
+1. Read user inputs:
+   - initial capital
+   - risk per trade
+   - win rate
+   - breakeven rate
+   - reward:risk ratio
+   - trades per month
+   - total months
+   - number of simulations
+
+2. Compute total number of trades:
+      numTrades = tradesPerMonth * months
+
+3. For each simulation (S times):
+   a. Initialize:
+      - balance = initial capital
+      - track consecutive wins/losses
+      - track max drawdown
+      - track monthly returns
+      - store trajectory starting point
+
+   b. For each trade T:
+      i.  Generate a random number (0 to 1)
+      ii. If random < winRate:
+              balance increases by (balance * risk * ratio)
+              consecutive win counter++
+          Else if random < winRate + breakevenRate:
+              no balance change (breakeven)
+          Else:
+              balance decreases by (balance * risk)
+              consecutive loss counter++
+
+      iii. Store current balance in trajectory
+      iv.  Update max drawdown
+      v.   Every X trades = 1 month:
+              compute monthly %
+              record month-end balance
+
+   c. After all trades:
+      - Save final balance
+      - Save drawdown
+      - Save max win streak & loss streak
+      - Save win percentage
+      - Save complete trajectory
+      - Save monthly returns
+
+4. After all simulations:
+   - Sort results by final balance
+   - Extract:
+        * Worst case (lowest final balance)
+        * Best case (highest final balance)
+        * Most probable (median simulation)
+
+5. Convert monthly arrays into objects with:
+   - year
+   - month name
+   - percent return
+   - ending dollar balance
+
+6. Return all results as JSON to main.js:
+   - trajectories for chart
+   - best, worst, median stats
+   - monthly stats
+   - drawdowns and streaks
+
+This file contains the FULL algorithm, while main.js
+only handles displaying results and sending requests.
+=========================================================
+*//
