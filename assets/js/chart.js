@@ -1,36 +1,46 @@
 let mcChart;
 
-function renderChart(data) {
+function renderChart(data, activeScenario = 'mostProbable') {
     const ctx = document.getElementById("mcChart").getContext("2d");
+    
+    // Create Gradient for the main line
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');   // Blue top
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');   // Transparent bottom
 
-    // Create x-axis labels based on number of points in mostProbableTrajectory
     const numPoints = data.mostProbableTrajectory.length;
-    const labels = Array.from({ length: numPoints }, (_, i) => i + 1); // 1,2,3,... trades
+    const labels = Array.from({ length: numPoints }, (_, i) => i + 1);
 
     const datasets = [
         {
             label: "Most Probable",
             data: data.mostProbableTrajectory,
-            borderColor: "blue",
-            fill: false,
+            borderColor: "#3b82f6",
+            backgroundColor: gradient,
+            fill: true,             // Fill area under the curve
             pointRadius: 0,
-            borderWidth: 1.5
+            borderWidth: 3,
+            tension: 0.3,           // Smooth lines
         },
         {
             label: "Best Case",
             data: data.bestTrajectory,
-            borderColor: "green",
+            borderColor: "#10b981", // Emerald Green
             fill: false,
             pointRadius: 0,
-            borderWidth: 1.5
+            borderWidth: 2,
+            borderDash: [5, 5],    // Dashed line for "potential"
+            tension: 0.3,
         },
         {
             label: "Worst Case",
             data: data.worstTrajectory,
-            borderColor: "red",
+            borderColor: "#ef4444", // Rose Red
             fill: false,
             pointRadius: 0,
-            borderWidth: 1.5
+            borderWidth: 2,
+            borderDash: [5, 5],
+            tension: 0.3,
         }
     ];
 
@@ -38,45 +48,27 @@ function renderChart(data) {
 
     mcChart = new Chart(ctx, {
         type: "line",
-        data: {
-            labels,   // <-- important
-            datasets
-        },
+        data: { labels, datasets },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             plugins: { 
-                legend: { display: true } 
+                legend: { 
+                    position: 'top',
+                    labels: { color: '#94a3b8', font: { weight: 'bold' }, usePointStyle: true }
+                }
             },
             scales: {
                 y: { 
-                    title: { display: true, text: "Balance ($)" } 
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#64748b', callback: value => '$' + value.toLocaleString() }
                 },
                 x: { 
-                    title: { display: true, text: "Trades" } 
+                    grid: { display: false },
+                    ticks: { color: '#64748b', maxRotation: 0 }
                 }
             }
         }
     });
 }
-
-new Chart(pieCtx, {
-    type: 'pie',
-    data: {
-        labels,
-        datasets: [{
-            label: 'Most Probable Balance Distribution (%)',
-            data: dataPercent,
-            backgroundColor: labels.map((_,i)=>`hsl(${i*40 % 360}, 70%, 50%)`)
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,  // <-- ensures chart stays circular
-        aspectRatio: 1,             // <-- forces width = height
-        plugins: {
-            legend: { position: 'right' },
-            title: { display: true, text: 'Most Probable Balance Distribution (%)' }
-        }
-    }
-});
-
